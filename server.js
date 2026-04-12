@@ -81,6 +81,10 @@ async function sbSelect(table, filters){
   return Array.isArray(data) ? data : [];
 }
 
+// ── MANAGER / PERSONAL SALES MAPPING ────────────────────────
+// Micah's personal bot number — orders show in manager dashboard
+const MICAH_BOT = '+14695236420';
+
 // ── IN-MEMORY FALLBACK ────────────────────────────────────────
 const stats = {};
 
@@ -166,6 +170,12 @@ app.post('/order', async (req, res) => {
 
     // Find rep_id from agent's Twilio number or AgentId
     let rep_id = agentId;
+    
+    // Check if this is Micah's personal bot number
+    if(!rep_id && (fromNumber === MICAH_BOT || fromNumber === '+14695236420')){
+      rep_id = 'MICAH';
+    }
+    
     if(!rep_id && fromNumber){
       const reps = await sbSelect('reps', { phone: fromNumber });
       if(reps.length > 0) rep_id = reps[0].id;
